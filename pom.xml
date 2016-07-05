@@ -31,11 +31,13 @@
             <artifactId>hibernate-entitymanager</artifactId>
             <version>4.3.1.Final</version>
         </dependency>
+        <!-- TODO Depedencia estranha, não é a correta, não use SNAPSHOTs e não é esse groupid-->
         <dependency>
             <groupId>unknown.binary</groupId>
             <artifactId>hibernate-jpa-2.1-api-1.0.0.Final</artifactId>
             <version>SNAPSHOT</version>
         </dependency>
+        <!-- TODO Dependencia repetida, e com groupid estranho também, não é o correto-->
         <dependency>
             <groupId>unknown.binary</groupId>
             <artifactId>postgresql-9.2-1002.jdbc4</artifactId>
@@ -66,6 +68,7 @@
             </plugin>
         </plugins>
     </build>
+    <!-- TODO Que diabos é isso haueuahe maldito netbeans, mal posso ver seus movimentos! -->
     <repositories>
         <repository>
             <id>unknown-jars-temp-repo</id>

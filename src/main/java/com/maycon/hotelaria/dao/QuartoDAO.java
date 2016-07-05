@@ -31,9 +31,11 @@ public class QuartoDAO {
             manager.persist(quarto);
             manager.getTransaction().commit();
         } catch (Exception e) {
+            // TODO A forma de mostrar o erro é da camada de view, e se eu estiver em um sistema WEB e for reutilizar essa DAO, vai mostrar um JOptionPane?
             JOptionPane.showMessageDialog(null, "Erro na tabela de quartos: " + e.getMessage(), "Problema no Banco de Dados", JOptionPane.ERROR_MESSAGE);
             sucesso = false;
         } finally {
+            // TODO Crie uma classe utilitária para esse tipo de coisa
             if (manager != null) {
                 entity.closable(manager);
             }
@@ -57,13 +59,15 @@ public class QuartoDAO {
             TypedQuery<Quarto> query = manager.createQuery(sql, Quarto.class);
             quartos = query.getResultList();
         } catch (Exception ex) {
+            // TODO A forma de mostrar o erro é da camada de view, e se eu estiver em um sistema WEB e for reutilizar essa DAO, vai mostrar um JOptionPane?
             JOptionPane.showMessageDialog(null, "Erro na consulta da tabela Quartos! " + ex.getMessage(), "Problema no Banco de Dados", JOptionPane.ERROR_MESSAGE);
         } finally {
+            // TODO Crie uma classe utilitária para esse tipo de coisa
             if (manager != null) {
                 entity.closable(manager);
             }
         }
-        return quartos != null ? quartos : Collections.<Quarto>emptyList();
+        return quartos != null ? quartos : Collections.emptyList();
     }
 
     /**
@@ -100,9 +104,11 @@ public class QuartoDAO {
             query.setParameter("tipo", tipo);
             quartos = query.getResultList();
         } catch (Exception ex) {
+            // TODO A forma de mostrar o erro é da camada de view, e se eu estiver em um sistema WEB e for reutilizar essa DAO, vai mostrar um JOptionPane?
             JOptionPane.showMessageDialog(null, "Erro na consulta da tabela Reservas! " + ex.getMessage(), "Problema no Banco de Dados", JOptionPane.ERROR_MESSAGE);
 
         } finally {
+            // TODO Crie uma classe utilitária para esse tipo de coisa
             if (manager != null) {
                 entity.closable(manager);
             }

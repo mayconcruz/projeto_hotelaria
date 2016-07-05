@@ -33,6 +33,8 @@ public class ReservaDAO {
             manager.getTransaction().commit();
             
         } catch (Exception e) {
+            // TODO A forma de mostrar o erro é da camada de view, e se eu estiver em um sistema WEB e for reutilizar essa DAO, vai mostrar um JOptionPane?
+            // TODO Cade o rollback em caso de erro?
             sucesso = false;
             JOptionPane.showMessageDialog(null, "Erro na tabela de reservas: " + e.getMessage(), "Problema no Banco de Dados", JOptionPane.ERROR_MESSAGE);
         } finally {
@@ -88,6 +90,8 @@ public class ReservaDAO {
             }                    
 
         } catch (Exception ex) {
+            // TODO A forma de mostrar o erro é da camada de view, e se eu estiver em um sistema WEB e for reutilizar essa DAO, vai mostrar um JOptionPane?
+            // TODO Cade o rollback em caso de erro?
             JOptionPane.showMessageDialog(null, "Erro na consulta da tabela Reservas! " + ex.getMessage(), "Problema no Banco de Dados", JOptionPane.ERROR_MESSAGE);
 
         } finally {
@@ -141,6 +145,8 @@ public class ReservaDAO {
             }
 
         } catch (Exception ex) {
+            // TODO A forma de mostrar o erro é da camada de view, e se eu estiver em um sistema WEB e for reutilizar essa DAO, vai mostrar um JOptionPane?
+            // TODO Cade o rollback em caso de erro?
             JOptionPane.showMessageDialog(null, "Erro na consulta da tabela Reservas! " + ex.getMessage(), "Problema no Banco de Dados", JOptionPane.ERROR_MESSAGE);
 
         } finally {

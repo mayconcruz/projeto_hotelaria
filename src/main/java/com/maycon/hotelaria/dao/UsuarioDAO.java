@@ -35,6 +35,7 @@ public class UsuarioDAO {
             JOptionPane.showMessageDialog(null, "Erro no Banco de Dados: " + p.getMessage(), "Problema no Banco de Dados", JOptionPane.ERROR_MESSAGE);
             sucesso = false;
         } finally {
+            // TODO Crie uma classe utilitária para esse tipo de coisa
             if (manager != null) {
                  entity.closable(manager);
             }
@@ -72,6 +73,7 @@ public class UsuarioDAO {
         } catch (Exception ex) {
             JOptionPane.showMessageDialog(null, "Erro na consulta da tabela Usuários! " + ex.getMessage(), "Erro", JOptionPane.ERROR_MESSAGE);
         } finally {
+            // TODO Crie uma classe utilitária para esse tipo de coisa
             if (manager != null) {
                 entity.closable(manager);
             }
