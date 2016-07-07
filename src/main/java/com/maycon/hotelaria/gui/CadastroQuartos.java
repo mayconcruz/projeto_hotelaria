@@ -6,6 +6,7 @@ import com.maycon.hotelaria.tabelas.TabelaFactory;
 import javax.swing.JOptionPane;
 import static com.maycon.hotelaria.validacoes.Validacoes.validaNumQuarto; //MANEIRA DE CHAMAR UM MÉTODO EST�?TICO PARA EXECUÇÃO
 import java.util.List;
+import javax.persistence.PersistenceException;
 
 public class CadastroQuartos extends javax.swing.JFrame {
 
@@ -244,18 +245,45 @@ public class CadastroQuartos extends javax.swing.JFrame {
             return;
         }
 
-        Quarto quarto = new Quarto();
-        QuartoDAO quartoDAO = new QuartoDAO();
-        quarto.setNumQuarto(Integer.parseInt(txtNumQuarto.getText()));
-        quarto.setTipoQuarto(cbTipoQuarto.getSelectedItem().toString());
-        quarto.setValorDiaria(Double.parseDouble(ftxtValorDiaria.getText().replace(".", "").replace(",", ".")));
-        quarto.setInformacoes(txaInformacoes.getText());
+        try{
+            Quarto quarto = new Quarto();
+            QuartoDAO quartoDAO = new QuartoDAO();
+            quarto.setNumQuarto(Integer.parseInt(txtNumQuarto.getText()));
+            quarto.setTipoQuarto(cbTipoQuarto.getSelectedItem().toString());
+            quarto.setValorDiaria(Double.parseDouble(ftxtValorDiaria.getText().replace(".", "").replace(",", ".")));
+            quarto.setInformacoes(txaInformacoes.getText());
 
-        if (quartoDAO.cadastraQuarto(quarto)) {
-            JOptionPane.showMessageDialog(rootPane, "Quarto cadastrado com sucesso!", "Cadastro!", JOptionPane.INFORMATION_MESSAGE);
+            if (quartoDAO.cadastrarQuarto(quarto)) {
+                JOptionPane.showMessageDialog(rootPane, "Quarto cadastrado com sucesso!", "Cadastro!", JOptionPane.INFORMATION_MESSAGE);
 
-            Object cabecalho[] = {"Número do Quarto", "Tipo do Quarto", "Valor da Diária", "Informações"};
-            List<Quarto> quartos = new QuartoDAO().consultaTodosQuartos();
+                Object cabecalho[] = {"Número do Quarto", "Tipo do Quarto", "Valor da Diária", "Informações"};
+                List<Quarto> quartos = new QuartoDAO().consultarTodosQuartos();
+
+                Object[][] dadosTable = new Object[quartos.size()][4];
+
+                for (int i = 0; i < quartos.size(); i++) {
+                    Quarto quartoTmp = quartos.get(i);
+                    dadosTable[i] = new Object[]{quartoTmp.getNumQuarto(), quartoTmp.getTipoQuarto(), quartoTmp.getValorDiaria(), quartoTmp.getInformacoes()};
+                }
+
+                TabelaFactory.createTable(cabecalho, dadosTable, tbQuartos);
+                txtNumQuarto.setText("");
+                cbTipoQuarto.setSelectedIndex(0);
+                ftxtValorDiaria.setText("");
+                txaInformacoes.setText("");
+            } else {
+                JOptionPane.showMessageDialog(rootPane, "Problema no cadastro do quarto!", "Erro!", JOptionPane.ERROR_MESSAGE);
+            }
+        }catch(PersistenceException p){
+            JOptionPane.showMessageDialog(null, "Erro na tabela de quartos: " + p.getMessage(), "Problema no Banco de Dados", JOptionPane.ERROR_MESSAGE);
+        }
+    }//GEN-LAST:event_btnCadastrarActionPerformed
+
+    private void btnConsultarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnConsultarActionPerformed
+        Object cabecalho[] = {"Numero do Quarto", "Tipo do Quarto", "Valor da Diaria", "Informa�oes"};
+        
+        try{
+            List<Quarto> quartos = new QuartoDAO().consultarTodosQuartos();
 
             Object[][] dadosTable = new Object[quartos.size()][4];
 
@@ -263,28 +291,10 @@ public class CadastroQuartos extends javax.swing.JFrame {
                 Quarto quartoTmp = quartos.get(i);
                 dadosTable[i] = new Object[]{quartoTmp.getNumQuarto(), quartoTmp.getTipoQuarto(), quartoTmp.getValorDiaria(), quartoTmp.getInformacoes()};
             }
-
             TabelaFactory.createTable(cabecalho, dadosTable, tbQuartos);
-            txtNumQuarto.setText("");
-            cbTipoQuarto.setSelectedIndex(0);
-            ftxtValorDiaria.setText("");
-            txaInformacoes.setText("");
-        } else {
-            JOptionPane.showMessageDialog(rootPane, "Problema no cadastro do quarto!", "Erro!", JOptionPane.ERROR_MESSAGE);
+        }catch(PersistenceException p){
+            JOptionPane.showMessageDialog(null, "Erro na consulta da tabela Quartos! " + p.getMessage(), "Problema no Banco de Dados", JOptionPane.ERROR_MESSAGE);
         }
-    }//GEN-LAST:event_btnCadastrarActionPerformed
-
-    private void btnConsultarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnConsultarActionPerformed
-        Object cabecalho[] = {"Numero do Quarto", "Tipo do Quarto", "Valor da Diaria", "Informa�oes"};
-        List<Quarto> quartos = new QuartoDAO().consultaTodosQuartos();
-
-        Object[][] dadosTable = new Object[quartos.size()][4];
-
-        for (int i = 0; i < quartos.size(); i++) {
-            Quarto quartoTmp = quartos.get(i);
-            dadosTable[i] = new Object[]{quartoTmp.getNumQuarto(), quartoTmp.getTipoQuarto(), quartoTmp.getValorDiaria(), quartoTmp.getInformacoes()};
-        }
-        TabelaFactory.createTable(cabecalho, dadosTable, tbQuartos);
     }//GEN-LAST:event_btnConsultarActionPerformed
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed

@@ -20,16 +20,16 @@ public class QuartoServiceImpl implements QuartoService {
 
     @Override
     public boolean cadastraQuarto(Quarto quarto) {
-        return quartoDAO.cadastraQuarto(quarto);
+        return quartoDAO.cadastrarQuarto(quarto);
     }
 
     @Override
     public List<Quarto> consultaTodosQuartos() {
-        return quartoDAO.consultaTodosQuartos();
+        return quartoDAO.consultarTodosQuartos();
     }
 
     @Override
     public List<Quarto> consultaQuartosDisponiveis(String tipo, String data_inicio, String data_final) {
-        return quartoDAO.consultaQuartosDisponiveis(tipo, data_inicio, data_final);
+        return quartoDAO.consultarQuartosDisponiveis(tipo, data_inicio, data_final);
     }
 }

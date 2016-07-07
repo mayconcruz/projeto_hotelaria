@@ -2,6 +2,7 @@ package com.maycon.hotelaria.services;
 
 import com.maycon.hotelaria.dao.ReservaDAO;
 import com.maycon.hotelaria.estruturas.Reserva;
+import com.maycon.hotelaria.estruturas.Usuario;
 import java.util.List;
 
 /**
@@ -20,17 +21,17 @@ public class ReservaServiceImpl implements ReservaService {
 
     @Override
     public boolean cadastraReservas(Reserva reserva) {
-        return reservaDAO.cadastraReservas(reserva);
+        return reservaDAO.cadastrarReservas(reserva);
     }
 
     @Override
-    public List<Reserva> consultaReservasUsuario(Integer idUsuario, String dataInicio, String dataFinal) {
-        return reservaDAO.consultaReservasUsuario(idUsuario, dataInicio, dataFinal);
+    public List<Reserva> consultaReservasUsuario(Usuario usuario, String dataInicio, String dataFinal) {
+        return reservaDAO.consultarReservasUsuario(usuario, dataInicio, dataFinal);
     }
 
     @Override
     public List<Reserva> consultaTodasReservas(String dataInicio, String dataFinal) {
-        return reservaDAO.consultaTodasReservas(dataInicio, dataFinal);
+        return reservaDAO.consultarTodasReservas(dataInicio, dataFinal);
     }
 
 }

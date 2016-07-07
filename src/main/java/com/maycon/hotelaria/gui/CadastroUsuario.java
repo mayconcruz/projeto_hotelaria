@@ -4,6 +4,7 @@ import com.maycon.hotelaria.estruturas.TipoUsuario;
 import com.maycon.hotelaria.estruturas.Usuario;
 import static com.maycon.hotelaria.validacoes.Validacoes.validaEmail;
 import com.maycon.hotelaria.dao.UsuarioDAO;
+import javax.persistence.PersistenceException;
 import javax.swing.JOptionPane;
 
 public class CadastroUsuario extends javax.swing.JFrame {
@@ -334,11 +335,15 @@ public class CadastroUsuario extends javax.swing.JFrame {
             return;
         }
 
-        if (new UsuarioDAO().verificaUsuario(txtEmail.getText())) {
-            JOptionPane.showMessageDialog(rootPane, "Já existe um usuário cadastrado com este email no sistema!", "Atenção!", JOptionPane.WARNING_MESSAGE);
-            txtEmail.setText("");
-            txtEmail.requestFocus();
-            return;
+        try{
+            if (new UsuarioDAO().verificarUsuario(txtEmail.getText())) {
+                JOptionPane.showMessageDialog(rootPane, "Já existe um usuário cadastrado com este email no sistema!", "Atenção!", JOptionPane.WARNING_MESSAGE);
+                txtEmail.setText("");
+                txtEmail.requestFocus();
+                return;
+            }
+        }catch(PersistenceException p){
+            JOptionPane.showMessageDialog(null, "Erro na consulta da tabela Usu�rios! " + p.getMessage(), "Problema no Banco de Dados", JOptionPane.ERROR_MESSAGE);
         }
 
         Usuario usuario = new Usuario();
@@ -355,12 +360,16 @@ public class CadastroUsuario extends javax.swing.JFrame {
         usuario.setTipoUsuario(TipoUsuario.COMUM);
         usuario.setTelefone(!(txtfTelefone.getText().equals("(  )     -    ")) ? txtfTelefone.getText() : "");
 
-        if (new UsuarioDAO().cadastraUsuario(usuario)) {
-            JOptionPane.showMessageDialog(rootPane, "Usuário cadastrado com sucesso!", "Cadastro!", JOptionPane.INFORMATION_MESSAGE);
-            this.dispose();
-            new Index().setVisible(true);
-        } else {
-            JOptionPane.showMessageDialog(rootPane, "Problema no cadastro do usuário!", "Erro!", JOptionPane.ERROR_MESSAGE);
+        try{
+            if (new UsuarioDAO().cadastrarUsuario(usuario)) {
+                JOptionPane.showMessageDialog(rootPane, "Usuário cadastrado com sucesso!", "Cadastro!", JOptionPane.INFORMATION_MESSAGE);
+                this.dispose();
+                new Index().setVisible(true);
+            } else {
+                JOptionPane.showMessageDialog(rootPane, "Problema no cadastro do usuário!", "Erro!", JOptionPane.ERROR_MESSAGE);
+            }
+        }catch(PersistenceException p){
+            JOptionPane.showMessageDialog(null, "Erro no Banco de Dados: " + p.getMessage(), "Problema no Banco de Dados", JOptionPane.ERROR_MESSAGE);
         }
 
     }//GEN-LAST:event_btnCadastrarActionPerformed

@@ -13,6 +13,7 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import javax.persistence.PersistenceException;
 import javax.swing.JOptionPane;
 
 public class ReservaQuarto extends javax.swing.JFrame {
@@ -248,19 +249,24 @@ public class ReservaQuarto extends javax.swing.JFrame {
                 c.add(Calendar.DAY_OF_MONTH, +1);
                 dataFinalOriginal = c.getTime();
             }
-            String dataInicio = formato.format(jdInicio.getDate());
-            String dataFinal = formato.format(dataFinalOriginal);
-            Object cabecalho[] = {"Id Quarto", "Número do Quarto", "Tipo do Quarto", "Valor da Diária", "Informações"};
-            List<Quarto> quartosDisponiveis = new QuartoDAO().consultaQuartosDisponiveis(tipoQuarto, dataInicio, dataFinal);
+            
+            try{
+                String dataInicio = formato.format(jdInicio.getDate());
+                String dataFinal = formato.format(dataFinalOriginal);
+                Object cabecalho[] = {"Id Quarto", "Número do Quarto", "Tipo do Quarto", "Valor da Diária", "Informações"};
+                List<Quarto> quartosDisponiveis = new QuartoDAO().consultarQuartosDisponiveis(tipoQuarto, dataInicio, dataFinal);
 
-            Object[][] dadosTable = new Object[quartosDisponiveis.size()][5];
+                Object[][] dadosTable = new Object[quartosDisponiveis.size()][5];
 
-            for (int i = 0; i < quartosDisponiveis.size(); i++) {
-                Quarto quartoTmp = quartosDisponiveis.get(i);
-                dadosTable[i] = new Object[]{quartoTmp.getIdQuarto(), quartoTmp.getNumQuarto(), quartoTmp.getTipoQuarto(), quartoTmp.getValorDiaria(), quartoTmp.getInformacoes()};
+                for (int i = 0; i < quartosDisponiveis.size(); i++) {
+                    Quarto quartoTmp = quartosDisponiveis.get(i);
+                    dadosTable[i] = new Object[]{quartoTmp.getIdQuarto(), quartoTmp.getNumQuarto(), quartoTmp.getTipoQuarto(), quartoTmp.getValorDiaria(), quartoTmp.getInformacoes()};
+                }
+                TabelaFactory.createTable(cabecalho, dadosTable, tbQuartosDisponiveis);
+                TabelaFactory.setTamanhoColuna(tbQuartosDisponiveis);
+            }catch(PersistenceException p){
+                JOptionPane.showMessageDialog(null, "Erro na consulta da tabela Reservas! " + p.getMessage(), "Problema no Banco de Dados", JOptionPane.ERROR_MESSAGE);
             }
-            TabelaFactory.createTable(cabecalho, dadosTable, tbQuartosDisponiveis);
-            TabelaFactory.setTamanhoColuna(tbQuartosDisponiveis);
         }
     }//GEN-LAST:event_btnConsultarQuartosActionPerformed
 
@@ -317,12 +323,16 @@ public class ReservaQuarto extends javax.swing.JFrame {
         reserva.setDataHoraEntrada(dataInicioTs);
         reserva.setDataHoraSaida(dataFinalTs);
 
-        if (reservaDAO.cadastraReservas(reserva)) {
-            JOptionPane.showMessageDialog(rootPane, "Reserva realizada com sucesso!", "Reserva!", JOptionPane.INFORMATION_MESSAGE);
-            this.dispose();
-            new MenuCliente().setVisible(true);
-        } else {
-            JOptionPane.showMessageDialog(rootPane, "Problema na reserva do quarto!", "Erro!", JOptionPane.ERROR_MESSAGE);
+        try{
+            if (reservaDAO.cadastrarReservas(reserva)) {
+                JOptionPane.showMessageDialog(rootPane, "Reserva realizada com sucesso!", "Reserva!", JOptionPane.INFORMATION_MESSAGE);
+                this.dispose();
+                new MenuCliente().setVisible(true);
+            } else {
+                JOptionPane.showMessageDialog(rootPane, "Problema na reserva do quarto!", "Erro!", JOptionPane.ERROR_MESSAGE);
+            }
+        }catch(PersistenceException p){
+            JOptionPane.showMessageDialog(null, "Erro na tabela de reservas: " + p.getMessage(), "Problema no Banco de Dados", JOptionPane.ERROR_MESSAGE);
         }
 
     }//GEN-LAST:event_btnReservarActionPerformed

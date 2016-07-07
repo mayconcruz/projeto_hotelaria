@@ -6,10 +6,13 @@ import javax.persistence.*;
  * Classe responsável por criar um EntityManager a partir de um persistence-unit pré-definido
  * @author Maycon
  */
-// TODO Essa classe deveria ser um singleton
+
 public class GerenciaEntity {
     
-    private EntityManagerFactory factory;
+    private static final GerenciaEntity instancia = new GerenciaEntity();
+    private static EntityManagerFactory factory;
+    private EntityManager manager;
+    
     
     public GerenciaEntity(){
         
@@ -19,21 +22,35 @@ public class GerenciaEntity {
      * Método responsável por criar um EntityManager a ser utilizado nas consultas JPQL
      * @return EntityManager gerado com base no persistence-unit
     */
-    // TODO Mudar nome do método, use verbo, tipo construir
-    public EntityManager constroiManager(){
-        // TODO Você está criando 1 EntityManagerFactory para cada consulta, só deve criar 1 para cada banco de dados a ser utilizado
+    
+    public static GerenciaEntity obterEntity(){
+        return instancia;
+    }
+    
+    public EntityManagerFactory getFactory(){
+        return factory;
+    }
+    
+    public void setFactory(){
         factory = Persistence.createEntityManagerFactory("HotelariaMaven");
-        return factory.createEntityManager();
+    }
+    
+    public EntityManager getManager(){
+        return manager;
+    }
+    
+    public void setManager(EntityManagerFactory fac){
+        this.manager = fac.createEntityManager();
     }
     
     /**
-     * Método responsável por fechar o manager e o factory criados no método constroiManager()
-     * @param manager EntityManager que possui as configurações necessárias para se criar uma consulta JPQL 
+     * Método responsável por fechar o manager criado no método setManager()
+     * 
      */
-    // TODO Mudar o nome do método, os nomes de métodos que fazem alguma ação devem ser verbos, tipo fechar
-    public void closable(EntityManager manager){
+    
+    public void destruirManager(){
         manager.close();
-        factory.close();
+
     }
     
 }

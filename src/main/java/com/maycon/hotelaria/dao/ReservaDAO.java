@@ -1,6 +1,7 @@
 package com.maycon.hotelaria.dao;
 
 import com.maycon.hotelaria.estruturas.Reserva;
+import com.maycon.hotelaria.estruturas.Usuario;
 import java.sql.Timestamp;
 import java.util.Collections;
 import java.util.List;
@@ -22,25 +23,21 @@ public class ReservaDAO {
      * reserva
      * @return TRUE ou FALSE, indicando sucesso ou falha no cadastro da reserva
      */
-    public boolean cadastraReservas(Reserva reserva) {
-        GerenciaEntity entity = new GerenciaEntity();
-        EntityManager manager = entity.constroiManager();
+    public boolean cadastrarReservas(Reserva reserva) throws PersistenceException {
+        GerenciaEntity entity = GerenciaEntity.obterEntity();
+        entity.setManager(entity.getFactory());
         boolean sucesso = true;
 
         try {
-            manager.getTransaction().begin();
-            manager.persist(reserva);
-            manager.getTransaction().commit();
+            entity.getManager().getTransaction().begin();
+            entity.getManager().persist(reserva);
+            entity.getManager().getTransaction().commit();
             
-        } catch (Exception e) {
-            // TODO A forma de mostrar o erro é da camada de view, e se eu estiver em um sistema WEB e for reutilizar essa DAO, vai mostrar um JOptionPane?
-            // TODO Cade o rollback em caso de erro?
+        } catch (PersistenceException p) {
             sucesso = false;
-            JOptionPane.showMessageDialog(null, "Erro na tabela de reservas: " + e.getMessage(), "Problema no Banco de Dados", JOptionPane.ERROR_MESSAGE);
+            entity.getManager().getTransaction().rollback();
         } finally {
-            if (manager != null) {
-                entity.closable(manager);
-            }
+            FinalizaManager.finalizarManager(entity);
         }
         return sucesso;
     }
@@ -49,16 +46,16 @@ public class ReservaDAO {
      * Método responsável por consultar as reservas de um determinado usuário do sistema. A consulta pode ou não ser 
      * filtrada pela data de início e de término da reserva.
      *
-     * @param idUsuario Inteiro que representa o id do usuário a ser pesquisadas as reservas
+     * @param usuario Usuário que deseja-se saber as reservas
      * @param dataInicio String que representa a data de inicio das reservas a serem pesquisadas
      * @param dataFinal String que representa a data final das reservas a serem pesquisadas
      * @return List de reservas feitas por um usuário específico. Caso não haja nenhuma reserva realizada pelo usuário, 
      * retorna uma lista vazia
      */
-    public List<Reserva> consultaReservasUsuario(Integer idUsuario, String dataInicio, String dataFinal) {
+    public List<Reserva> consultarReservasUsuario(Usuario usuario, String dataInicio, String dataFinal) throws PersistenceException {
         List<Reserva> reservasUsuarios = null;
-        GerenciaEntity entity = new GerenciaEntity();
-        EntityManager manager = entity.constroiManager();
+        GerenciaEntity entity = GerenciaEntity.obterEntity();
+        entity.setManager(entity.getFactory());
         
         try {
             
@@ -72,8 +69,8 @@ public class ReservaDAO {
                 dataInicioTs = Timestamp.valueOf(dataInicio + " 14:00:00");
                 dataFinalTs = Timestamp.valueOf(dataFinal + " 12:00:00");
 
-                TypedQuery<Reserva> query = manager.createQuery(sql, Reserva.class);
-                query.setParameter("usuario", idUsuario);
+                TypedQuery<Reserva> query = entity.getManager().createQuery(sql, Reserva.class);
+                query.setParameter("usuario", usuario.getIdUsuario());
                 query.setParameter("entrada", dataInicioTs);
                 query.setParameter("saida", dataFinalTs);
                 reservasUsuarios = query.getResultList();
@@ -84,21 +81,15 @@ public class ReservaDAO {
                             +" WHERE r.usuario.idUsuario = :cliente"
                             +" ORDER BY dataHoraEntrada";
 
-                TypedQuery<Reserva> query = manager.createQuery(sql, Reserva.class); 
-                query.setParameter("cliente", idUsuario);
+                TypedQuery<Reserva> query = entity.getManager().createQuery(sql, Reserva.class); 
+                query.setParameter("cliente", usuario.getIdUsuario());
                 reservasUsuarios = query.getResultList();
             }                    
 
-        } catch (Exception ex) {
-            // TODO A forma de mostrar o erro é da camada de view, e se eu estiver em um sistema WEB e for reutilizar essa DAO, vai mostrar um JOptionPane?
-            // TODO Cade o rollback em caso de erro?
-            JOptionPane.showMessageDialog(null, "Erro na consulta da tabela Reservas! " + ex.getMessage(), "Problema no Banco de Dados", JOptionPane.ERROR_MESSAGE);
-
+        } catch (PersistenceException p) {         
+            entity.getManager().getTransaction().rollback();  
         } finally {
-            if (manager!= null) {
-                entity.closable(manager);
-
-            }
+            FinalizaManager.finalizarManager(entity);
           }
         return reservasUsuarios != null ? reservasUsuarios : Collections.<Reserva>emptyList();
     }
@@ -115,10 +106,10 @@ public class ReservaDAO {
      * @return List contendo todas as reservas. Caso não haja nenhuma reserva realizada no período escolhido, 
      * retorna uma lista vazia
      */
-    public List<Reserva> consultaTodasReservas(String dataInicio, String dataFinal) {
+    public List<Reserva> consultarTodasReservas(String dataInicio, String dataFinal) throws PersistenceException {
         List<Reserva> reservas = null;
-        GerenciaEntity entity = new GerenciaEntity();
-        EntityManager manager = entity.constroiManager();
+        GerenciaEntity entity = GerenciaEntity.obterEntity();
+        entity.setManager(entity.getFactory());
 
         try {
             if (!"".equals(dataInicio) || !"".equals(dataFinal)) {
@@ -131,7 +122,7 @@ public class ReservaDAO {
                 dataInicioTs = Timestamp.valueOf(dataInicio + " 14:00:00");
                 dataFinalTs = Timestamp.valueOf(dataFinal + " 12:00:00");
 
-                TypedQuery<Reserva> query = manager.createQuery(sql, Reserva.class);
+                TypedQuery<Reserva> query = entity.getManager().createQuery(sql, Reserva.class);
                 query.setParameter("entrada", dataInicioTs);
                 query.setParameter("saida", dataFinalTs);
                 reservas = query.getResultList();
@@ -140,19 +131,14 @@ public class ReservaDAO {
                 String sql = "FROM Reserva r "
                         + " ORDER BY r.usuario.nome";
 
-                TypedQuery<Reserva> query = manager.createQuery(sql, Reserva.class);
+                TypedQuery<Reserva> query = entity.getManager().createQuery(sql, Reserva.class);
                 reservas = query.getResultList();
             }
 
-        } catch (Exception ex) {
-            // TODO A forma de mostrar o erro é da camada de view, e se eu estiver em um sistema WEB e for reutilizar essa DAO, vai mostrar um JOptionPane?
-            // TODO Cade o rollback em caso de erro?
-            JOptionPane.showMessageDialog(null, "Erro na consulta da tabela Reservas! " + ex.getMessage(), "Problema no Banco de Dados", JOptionPane.ERROR_MESSAGE);
-
+        } catch (PersistenceException p) {       
+            entity.getManager().getTransaction().rollback();
         } finally {
-            if (manager != null) {
-                entity.closable(manager);
-            } 
+            FinalizaManager.finalizarManager(entity);
 
         }
         return reservas != null ? reservas : Collections.<Reserva>emptyList();

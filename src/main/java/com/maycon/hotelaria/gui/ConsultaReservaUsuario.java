@@ -9,6 +9,7 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import javax.persistence.PersistenceException;
 import javax.swing.JOptionPane;
 
 public class ConsultaReservaUsuario extends javax.swing.JFrame {
@@ -18,35 +19,38 @@ public class ConsultaReservaUsuario extends javax.swing.JFrame {
 
         Sessao sessao = Sessao.getInstance();
 
-        if (sessao.getUsuario().getTipoUsuario() == TipoUsuario.ADMINISTRADOR) {
-            Object cabecalho[] = {"Nome", "CPF", "Email", "Telefone", "Quarto", "Data Inicial", "Data Final"};
-            List<Reserva> reservas = new ReservaDAO().consultaTodasReservas("", "");
-            Object[][] dadosTable = new Object[reservas.size()][7];
+        try{
+            if (sessao.getUsuario().getTipoUsuario() == TipoUsuario.ADMINISTRADOR) {
+                Object cabecalho[] = {"Nome", "CPF", "Email", "Telefone", "Quarto", "Data Inicial", "Data Final"};
+                List<Reserva> reservas = new ReservaDAO().consultarTodasReservas("", "");
+                Object[][] dadosTable = new Object[reservas.size()][7];
 
-            for (int i = 0; i < reservas.size(); i++) {
-                Reserva reservaTmp = reservas.get(i);
-                dadosTable[i] = new Object[]{reservaTmp.getUsuario().getNome(), reservaTmp.getUsuario().getCpf(),
-                    reservaTmp.getUsuario().getEmail(), reservaTmp.getUsuario().getTelefone(), reservaTmp.getQuarto().getNumQuarto(),
-                    new SimpleDateFormat("dd/MM/yyyy HH:mm:ss").format(reservaTmp.getDataHoraEntrada()), 
-                    new SimpleDateFormat("dd/MM/yyyy HH:mm:ss").format(reservaTmp.getDataHoraSaida())};
+                for (int i = 0; i < reservas.size(); i++) {
+                    Reserva reservaTmp = reservas.get(i);
+                    dadosTable[i] = new Object[]{reservaTmp.getUsuario().getNome(), reservaTmp.getUsuario().getCpf(),
+                        reservaTmp.getUsuario().getEmail(), reservaTmp.getUsuario().getTelefone(), reservaTmp.getQuarto().getNumQuarto(),
+                        new SimpleDateFormat("dd/MM/yyyy HH:mm:ss").format(reservaTmp.getDataHoraEntrada()), 
+                        new SimpleDateFormat("dd/MM/yyyy HH:mm:ss").format(reservaTmp.getDataHoraSaida())};
+                }
+                TabelaFactory.createTable(cabecalho, dadosTable, tbUsuarioReservas);
             }
-            TabelaFactory.createTable(cabecalho, dadosTable, tbUsuarioReservas);
-        }
-        else{
-            Object cabecalho[] = {"Número do Quarto", "Tipo do Quarto", "Data Inicial da Reserva", "Data Final da Reserva"};
-            List<Reserva> reservas_usuario = new ReservaDAO().consultaReservasUsuario(sessao.getUsuario().getIdUsuario(), "", "");
-            Object[][] dadosTable = new Object[reservas_usuario.size()][4];
+            else{
+                Object cabecalho[] = {"Número do Quarto", "Tipo do Quarto", "Data Inicial da Reserva", "Data Final da Reserva"};
+                List<Reserva> reservas_usuario = new ReservaDAO().consultarReservasUsuario(sessao.getUsuario(), "", "");
+                Object[][] dadosTable = new Object[reservas_usuario.size()][4];
 
-            for (int i = 0; i < reservas_usuario.size(); i++) {
-                Reserva reservaTmp = reservas_usuario.get(i);
-                dadosTable[i] = new Object[]{reservaTmp.getQuarto().getNumQuarto(), reservaTmp.getQuarto().getTipoQuarto(),
-                    new SimpleDateFormat("dd/MM/yyyy HH:mm:ss").format(reservaTmp.getDataHoraEntrada()),
-                    new SimpleDateFormat("dd/MM/yyyy HH:mm:ss").format(reservaTmp.getDataHoraSaida())};
+                for (int i = 0; i < reservas_usuario.size(); i++) {
+                    Reserva reservaTmp = reservas_usuario.get(i);
+                    dadosTable[i] = new Object[]{reservaTmp.getQuarto().getNumQuarto(), reservaTmp.getQuarto().getTipoQuarto(),
+                        new SimpleDateFormat("dd/MM/yyyy HH:mm:ss").format(reservaTmp.getDataHoraEntrada()),
+                        new SimpleDateFormat("dd/MM/yyyy HH:mm:ss").format(reservaTmp.getDataHoraSaida())};
+                }
+
+                TabelaFactory.createTable(cabecalho, dadosTable, tbUsuarioReservas);
             }
-
-            TabelaFactory.createTable(cabecalho, dadosTable, tbUsuarioReservas);
+        }catch(PersistenceException p){
+            JOptionPane.showMessageDialog(null, "Erro na consulta da tabela Reservas! " + p.getMessage(), "Problema no Banco de Dados", JOptionPane.ERROR_MESSAGE);
         }
-
     }
 
     /**
@@ -209,7 +213,7 @@ public class ConsultaReservaUsuario extends javax.swing.JFrame {
         Sessao sessao = Sessao.getInstance();
         if (TipoUsuario.ADMINISTRADOR == sessao.getUsuario().getTipoUsuario()) {
             Object cabecalho[] = {"Nome", "CPF", "Email", "Telefone", "Quarto", "Data Inicial", "Data Final"};
-            List<Reserva> reservas = new ReservaDAO().consultaTodasReservas(dataInicio, dataFinal);
+            List<Reserva> reservas = new ReservaDAO().consultarTodasReservas(dataInicio, dataFinal);
             Object[][] dadosTable = new Object[reservas.size()][7];
 
             for (int i = 0; i < reservas.size(); i++) {
@@ -223,7 +227,7 @@ public class ConsultaReservaUsuario extends javax.swing.JFrame {
             TabelaFactory.createTable(cabecalho, dadosTable, tbUsuarioReservas);
         } else {
             Object cabecalho[] = {"Número do Quarto", "Tipo do Quarto", "Data Inicial da Reserva", "Data Final da Reserva"};
-            List<Reserva> reservas_usuario = new ReservaDAO().consultaReservasUsuario(sessao.getUsuario().getIdUsuario(), dataInicio, dataFinal);
+            List<Reserva> reservas_usuario = new ReservaDAO().consultarReservasUsuario(sessao.getUsuario(), dataInicio, dataFinal);
             Object[][] dadosTable = new Object[reservas_usuario.size()][4];
 
             for (int i = 0; i < reservas_usuario.size(); i++) {

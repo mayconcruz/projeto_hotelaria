@@ -4,6 +4,7 @@ import com.maycon.hotelaria.estruturas.Sessao;
 import com.maycon.hotelaria.estruturas.TipoUsuario;
 import com.maycon.hotelaria.estruturas.Usuario;
 import com.maycon.hotelaria.dao.UsuarioDAO;
+import javax.persistence.PersistenceException;
 import javax.swing.JOptionPane;
 
 public class Index extends javax.swing.JFrame {
@@ -152,25 +153,29 @@ public class Index extends javax.swing.JFrame {
             return;
         }
 
-        Usuario usuario = new UsuarioDAO().realizaLoginUsuario(email, senha);
+        try{
+            Usuario usuario = new UsuarioDAO().realizarLoginUsuario(email, senha);
 
-        //PROGRAMAÇÃO DEFENSIVA
-        if (usuario == null) {
-            JOptionPane.showMessageDialog(rootPane, "Usuário e/ou senha incorretos!", "Erro", JOptionPane.ERROR_MESSAGE);
-            txtUsuario.setText("");
-            jpSenha.setText("");
-            txtUsuario.requestFocus();
-        } else {
-            this.dispose();
-            if (TipoUsuario.ADMINISTRADOR == usuario.getTipoUsuario()) {
-                new MenuAdmin().setVisible(true);
-                Sessao sessao = Sessao.getInstance();
-                sessao.setUsuario(usuario);
+            //PROGRAMAÇÃO DEFENSIVA
+            if (usuario == null) {
+                JOptionPane.showMessageDialog(rootPane, "Usuário e/ou senha incorretos!", "Erro", JOptionPane.ERROR_MESSAGE);
+                txtUsuario.setText("");
+                jpSenha.setText("");
+                txtUsuario.requestFocus();
             } else {
-                new MenuCliente().setVisible(true);
-                Sessao sessao = Sessao.getInstance();
-                sessao.setUsuario(usuario);
+                this.dispose();
+                if (TipoUsuario.ADMINISTRADOR == usuario.getTipoUsuario()) {
+                    new MenuAdmin().setVisible(true);
+                    Sessao sessao = Sessao.getInstance();
+                    sessao.setUsuario(usuario);
+                } else {
+                    new MenuCliente().setVisible(true);
+                    Sessao sessao = Sessao.getInstance();
+                    sessao.setUsuario(usuario);
+                }
             }
+        }catch(PersistenceException p){
+            JOptionPane.showMessageDialog(null, "Erro na consulta da tabela Usuários! " + p.getMessage(), "Erro", JOptionPane.ERROR_MESSAGE);
         }
     }//GEN-LAST:event_btnAcessarActionPerformed
 

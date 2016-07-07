@@ -1,6 +1,7 @@
 package com.maycon.hotelaria.services;
 
 import com.maycon.hotelaria.estruturas.Reserva;
+import com.maycon.hotelaria.estruturas.Usuario;
 import java.util.List;
 
 /**
@@ -25,12 +26,12 @@ public interface ReservaService {
      * O método realiza a consulta das reservas realizadas por um determinado
      * usuário, no Banco de Dados, a partir do identificador deste usuário.
      *
-     * @param idUsuario Integer que representa o identificador do usuário
+     * @param usuario Usu�rio que deseja-se saber as reservas
      * @param dataInicio String que representa a data inicial das reservas de interesse
      * @param dataFinal String que representa a data final das reservas de interesse
      * @return List com as reservas realizadas pelo usuário.
      */
-    List<Reserva> consultaReservasUsuario(Integer idUsuario, String dataInicio, String dataFinal); // TODO Mudar para receber o usuário
+    List<Reserva> consultaReservasUsuario(Usuario usuario, String dataInicio, String dataFinal); // TODO Mudar para receber o usuário
 
     /**
      * O método realiza a consulta de todas as reservas contidas no Banco de

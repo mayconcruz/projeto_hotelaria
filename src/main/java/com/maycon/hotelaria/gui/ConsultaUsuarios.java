@@ -4,6 +4,8 @@ import com.maycon.hotelaria.dao.UsuarioDAO;
 import com.maycon.hotelaria.estruturas.Usuario;
 import com.maycon.hotelaria.tabelas.TabelaFactory;
 import java.util.List;
+import javax.persistence.PersistenceException;
+import javax.swing.JOptionPane;
 
 public class ConsultaUsuarios extends javax.swing.JFrame {
 
@@ -114,28 +116,38 @@ public class ConsultaUsuarios extends javax.swing.JFrame {
 
     private void btnConsultarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnConsultarActionPerformed
         Object cabecalho[] = {"Nome", "CPF", "Email", "Telefone"};
-        List<Usuario> usuarios = new UsuarioDAO().consultaUsuarios("");
+        
+        try{
+            List<Usuario> usuarios = new UsuarioDAO().consultarUsuarios("");
 
-        Object[][] dadosTable = new Object[usuarios.size()][4];
+            Object[][] dadosTable = new Object[usuarios.size()][4];
 
-        for (int i = 0; i < usuarios.size(); i++) {
-            Usuario usuarioTmp = usuarios.get(i);
-            dadosTable[i] = new Object[]{usuarioTmp.getNome(), usuarioTmp.getCpf(), usuarioTmp.getEmail(), usuarioTmp.getTelefone()};
+            for (int i = 0; i < usuarios.size(); i++) {
+                Usuario usuarioTmp = usuarios.get(i);
+                dadosTable[i] = new Object[]{usuarioTmp.getNome(), usuarioTmp.getCpf(), usuarioTmp.getEmail(), usuarioTmp.getTelefone()};
+            }
+            TabelaFactory.createTable(cabecalho, dadosTable, tbUsuarios);
+        }catch(PersistenceException p){
+            JOptionPane.showMessageDialog(null, "Erro na consulta da tabela Usuários! " + p.getMessage(), "Problema no Banco de Dados", JOptionPane.ERROR_MESSAGE);
         }
-        TabelaFactory.createTable(cabecalho, dadosTable, tbUsuarios);
     }//GEN-LAST:event_btnConsultarActionPerformed
 
     private void btnConsultarNomeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnConsultarNomeActionPerformed
         Object cabecalho[] = {"Nome", "CPF", "Email", "Telefone"};
-        List<Usuario> usuarios = new UsuarioDAO().consultaUsuarios(txtNome.getText());
+        
+        try{
+            List<Usuario> usuarios = new UsuarioDAO().consultarUsuarios(txtNome.getText());
 
-        Object[][] dadosTable = new Object[usuarios.size()][4];
+            Object[][] dadosTable = new Object[usuarios.size()][4];
 
-        for (int i = 0; i < usuarios.size(); i++) {
-            Usuario usuarioTmp = usuarios.get(i);
-            dadosTable[i] = new Object[]{usuarioTmp.getNome(), usuarioTmp.getCpf(), usuarioTmp.getEmail(), usuarioTmp.getTelefone()};
+            for (int i = 0; i < usuarios.size(); i++) {
+                Usuario usuarioTmp = usuarios.get(i);
+                dadosTable[i] = new Object[]{usuarioTmp.getNome(), usuarioTmp.getCpf(), usuarioTmp.getEmail(), usuarioTmp.getTelefone()};
+            }
+            TabelaFactory.createTable(cabecalho, dadosTable, tbUsuarios);
+        }catch(PersistenceException p){
+            JOptionPane.showMessageDialog(null, "Erro na consulta da tabela Usuários! " + p.getMessage(), "Problema no Banco de Dados", JOptionPane.ERROR_MESSAGE);
         }
-        TabelaFactory.createTable(cabecalho, dadosTable, tbUsuarios);
     }//GEN-LAST:event_btnConsultarNomeActionPerformed
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed

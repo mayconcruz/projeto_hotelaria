@@ -20,22 +20,22 @@ public class UsuarioServiceImpl implements UsuarioService {
 
     @Override
     public boolean cadastraUsuario(Usuario usuario) {
-        return usuarioDAO.cadastraUsuario(usuario);
+        return usuarioDAO.cadastrarUsuario(usuario);
     }
 
     @Override
     public Usuario realizaLoginUsuario(String email, String senha) {
-        return usuarioDAO.realizaLoginUsuario(email, senha);
+        return usuarioDAO.realizarLoginUsuario(email, senha);
     }
 
     @Override
     public List<Usuario> consultaUsuarios(String filtro) {
-        return usuarioDAO.consultaUsuarios(filtro);
+        return usuarioDAO.consultarUsuarios(filtro);
     }
 
     @Override
     public boolean verificaUsuario(String email) {
-        return usuarioDAO.verificaUsuario(email);
+        return usuarioDAO.verificarUsuario(email);
     }
 
 }

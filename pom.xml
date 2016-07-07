@@ -22,26 +22,19 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>org.postgresql</groupId>
-            <artifactId>postgresql</artifactId>
-            <version>9.4-1206-jdbc42</version>
-        </dependency>
-        <dependency>
             <groupId>org.hibernate</groupId>
             <artifactId>hibernate-entitymanager</artifactId>
             <version>4.3.1.Final</version>
         </dependency>
-        <!-- TODO Depedencia estranha, não é a correta, não use SNAPSHOTs e não é esse groupid-->
         <dependency>
-            <groupId>unknown.binary</groupId>
-            <artifactId>hibernate-jpa-2.1-api-1.0.0.Final</artifactId>
-            <version>SNAPSHOT</version>
+            <groupId>org.hibernate.javax.persistence</groupId>
+            <artifactId>hibernate-jpa-2.0-api</artifactId>
+            <version>1.0.1.Final</version>
         </dependency>
-        <!-- TODO Dependencia repetida, e com groupid estranho também, não é o correto-->
         <dependency>
-            <groupId>unknown.binary</groupId>
-            <artifactId>postgresql-9.2-1002.jdbc4</artifactId>
-            <version>SNAPSHOT</version>
+            <groupId>org.postgresql</groupId>
+            <artifactId>postgresql</artifactId>
+            <version>9.4.1208</version>
         </dependency>
     </dependencies>
     <build>
@@ -68,12 +61,4 @@
             </plugin>
         </plugins>
     </build>
-    <!-- TODO Que diabos é isso haueuahe maldito netbeans, mal posso ver seus movimentos! -->
-    <repositories>
-        <repository>
-            <id>unknown-jars-temp-repo</id>
-            <name>A temporary repository created by NetBeans for libraries and jars it could not identify. Please replace the dependencies in this repository with correct ones and delete this repository.</name>
-            <url>file:${project.basedir}/lib</url>
-        </repository>
-    </repositories>
 </project>

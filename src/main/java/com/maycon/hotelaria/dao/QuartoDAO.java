@@ -21,24 +21,20 @@ public class QuartoDAO {
      * @param quarto Objeto do tipo Quarto que contém as informações do quarto
      * @return TRUE ou FALSE, indicando sucesso ou falha no cadastro do quarto
      */
-    public boolean cadastraQuarto(Quarto quarto) {
-        GerenciaEntity entity = new GerenciaEntity();
-        EntityManager manager = entity.constroiManager();
+    public boolean cadastrarQuarto(Quarto quarto) throws PersistenceException {
+        GerenciaEntity entity = GerenciaEntity.obterEntity();
+       entity.setManager(entity.getFactory());
         boolean sucesso = true;
 
         try {
-            manager.getTransaction().begin();
-            manager.persist(quarto);
-            manager.getTransaction().commit();
-        } catch (Exception e) {
-            // TODO A forma de mostrar o erro é da camada de view, e se eu estiver em um sistema WEB e for reutilizar essa DAO, vai mostrar um JOptionPane?
-            JOptionPane.showMessageDialog(null, "Erro na tabela de quartos: " + e.getMessage(), "Problema no Banco de Dados", JOptionPane.ERROR_MESSAGE);
+            entity.getManager().getTransaction().begin();
+            entity.getManager().persist(quarto);
+            entity.getManager().getTransaction().commit();
+        } catch (PersistenceException p) {
             sucesso = false;
+            entity.getManager().getTransaction().rollback();
         } finally {
-            // TODO Crie uma classe utilitária para esse tipo de coisa
-            if (manager != null) {
-                entity.closable(manager);
-            }
+            FinalizaManager.finalizarManager(entity);
         }
         return sucesso;
     }
@@ -49,23 +45,19 @@ public class QuartoDAO {
      * @return List contendo todos os quartos cadastrados. Caso não haja nenhum quarto, retorna uma lista vazia.
      */
     //UTILIZAR UM TIPO DE COLLECTION PERMITE QUE O CÓDIGO FIQUE MAIS FLEXÍVEL PARA O TRATAMENTO DOS DADOS RETORNADOS
-    public List<Quarto> consultaTodosQuartos() {
-        GerenciaEntity entity = new GerenciaEntity();
-        EntityManager manager = entity.constroiManager();
+    public List<Quarto> consultarTodosQuartos() throws PersistenceException {
+        GerenciaEntity entity = GerenciaEntity.obterEntity();
+        entity.setManager(entity.getFactory());
         List<Quarto> quartos = null;
 
         try {
             String sql = "FROM Quarto";
-            TypedQuery<Quarto> query = manager.createQuery(sql, Quarto.class);
+            TypedQuery<Quarto> query = entity.getManager().createQuery(sql, Quarto.class);
             quartos = query.getResultList();
-        } catch (Exception ex) {
-            // TODO A forma de mostrar o erro é da camada de view, e se eu estiver em um sistema WEB e for reutilizar essa DAO, vai mostrar um JOptionPane?
-            JOptionPane.showMessageDialog(null, "Erro na consulta da tabela Quartos! " + ex.getMessage(), "Problema no Banco de Dados", JOptionPane.ERROR_MESSAGE);
+        } catch (PersistenceException p) {
+            entity.getManager().getTransaction().rollback();
         } finally {
-            // TODO Crie uma classe utilitária para esse tipo de coisa
-            if (manager != null) {
-                entity.closable(manager);
-            }
+            FinalizaManager.finalizarManager(entity);
         }
         return quartos != null ? quartos : Collections.emptyList();
     }
@@ -81,11 +73,11 @@ public class QuartoDAO {
      * @return List contendo todos os quartos disponíveis para reserva. Caso não haja nenhum quarto disponível, retorna uma lista vazia
      */
     //UTILIZAR UM TIPO DE COLLECTION PERMITE QUE O CÓDIGO FIQUE MAIS FLEXÃ?VEL PARA O TRATAMENTO DOS DADOS RETORNADOS
-    public List<Quarto> consultaQuartosDisponiveis(String tipo, String dataInicio, String dataFinal) {
+    public List<Quarto> consultarQuartosDisponiveis(String tipo, String dataInicio, String dataFinal) throws PersistenceException {
 
         List<Quarto> quartos = null;
-        GerenciaEntity entity = new GerenciaEntity();
-        EntityManager manager = entity.constroiManager();
+        GerenciaEntity entity = GerenciaEntity.obterEntity();
+        entity.setManager(entity.getFactory());
 
         try {
 
@@ -98,20 +90,15 @@ public class QuartoDAO {
                         + "AND q = r.quarto) "
                         + "AND (q.tipoQuarto = :tipo OR :tipo IS NULL)";
             
-            TypedQuery<Quarto> query = manager.createQuery(sql, Quarto.class);
+            TypedQuery<Quarto> query = entity.getManager().createQuery(sql, Quarto.class);
             query.setParameter("data_entrada", dataInicioTs);
             query.setParameter("data_saida", dataFinalTs);
             query.setParameter("tipo", tipo);
             quartos = query.getResultList();
-        } catch (Exception ex) {
-            // TODO A forma de mostrar o erro é da camada de view, e se eu estiver em um sistema WEB e for reutilizar essa DAO, vai mostrar um JOptionPane?
-            JOptionPane.showMessageDialog(null, "Erro na consulta da tabela Reservas! " + ex.getMessage(), "Problema no Banco de Dados", JOptionPane.ERROR_MESSAGE);
-
+        } catch (PersistenceException p) {
+            entity.getManager().getTransaction().rollback();
         } finally {
-            // TODO Crie uma classe utilitária para esse tipo de coisa
-            if (manager != null) {
-                entity.closable(manager);
-            }
+            FinalizaManager.finalizarManager(entity);
         }
         return quartos != null ? quartos : Collections.<Quarto>emptyList();
     }
